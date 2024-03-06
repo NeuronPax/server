@@ -16,6 +16,23 @@ class UserService {
     const token = tokenService.generateToken({userId: userDto.id})
     return {token, user: userDto}
   }
+  async login({email, password}) {
+    const user = await userModel.findOne({email})
+    if (!user) {
+      throw ApiError.BadRequest(`Неверный логин или пароль`)
+    }
+    const isPassEquals = await bcrypt.compare(password, user.password)
+    if (!isPassEquals) {
+      throw ApiError.BadRequest(`Неверный логин или пароль`)
+    }
+    const userDto = new UserDto(user)
+    const token = tokenService.generateToken({userId: userDto.id})
+    return {token, user: userDto}
+  }
+  async getUsers() {
+    const users = await userModel.find()
+    return users
+  }
 }
 
 module.exports = new UserService()
