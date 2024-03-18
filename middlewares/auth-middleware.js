@@ -11,11 +11,11 @@ module.exports = function(req, res, next) {
     if (!accessToken) {
       return next(ApiError.UnauthorizedError())
     }
-    const userData = tokenService.validateAccessToken(accessToken)
-    if (!userData) {
+    const {userId} = tokenService.validateAccessToken(accessToken)
+    if (!userId) {
       return next(ApiError.UnauthorizedError())
     }
-    req.user = userData
+    req.body = {userId}
     next()
   } catch (e) {
     next(ApiError.UnauthorizedError())

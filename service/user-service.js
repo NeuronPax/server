@@ -12,9 +12,8 @@ class UserService {
     }
     const hashPassword = await bcrypt.hash(password, 3)
     const user = await userModel.create({email, password: hashPassword})
-    const userDto = new UserDto(user)
-    const token = tokenService.generateToken({userId: userDto.id})
-    return {token, user: userDto}
+    const token = tokenService.generateToken({userId: user._id})
+    return {token}
   }
   async login({email, password}) {
     const user = await userModel.findOne({email})
@@ -25,13 +24,13 @@ class UserService {
     if (!isPassEquals) {
       throw ApiError.BadRequest(`Неверный логин или пароль`)
     }
-    const userDto = new UserDto(user)
-    const token = tokenService.generateToken({userId: userDto.id})
-    return {token, user: userDto}
+    const token = tokenService.generateToken({userId: user._id})
+    return {token}
   }
-  async getUsers() {
-    const users = await userModel.find()
-    return users
+  async getMe({userId}) {
+    const user = await userModel.findOne({_id: userId})
+    const userDto = new UserDto(user)
+    return userDto
   }
 }
 
